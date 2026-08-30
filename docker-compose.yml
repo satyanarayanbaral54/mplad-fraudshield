@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: mplad_postgres
+    environment:
+      POSTGRES_DB: mplad_db
+      POSTGRES_USER: mplad
+      POSTGRES_PASSWORD: mplad_secure_2025
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mplad -d mplad_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: mplad_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: mplad_backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgresql://mplad:mplad_secure_2025@postgres:5432/mplad_db
+      - REDIS_URL=redis://redis:6379/0
+      - APP_ENV=production
+      - DEBUG=False
+      - SECRET_KEY=mplad_super_secret_jwt_key_2025
+    volumes:
+      - ./backend:/app
+    command: sh -c "python startup_check.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: mplad_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
