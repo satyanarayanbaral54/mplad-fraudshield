@@ -1,7 +1,7 @@
 # 🇮🇳 MPLAD FraudShield
 
 **AI-Powered Forensic Audit, Fiscal Integrity & Anti-Corruption Analytics for MPLADS**  
-*Built for Smart India Hackathon (SIH 2025)*
+*Built for College Internal Smart India Hackathon (SIH 2026)*
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
